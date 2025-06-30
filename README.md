@@ -1,5 +1,8 @@
 # labmedia
 
+Тестовое задание находится в папке src/hooks
+Пример использования хуков в src/App.vue
+
 ## Project setup
 ```
 npm install
