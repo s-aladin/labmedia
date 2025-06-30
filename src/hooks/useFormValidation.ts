@@ -1,4 +1,4 @@
-import { ref, Ref} from "vue";
+import {computed, ComputedRef, ref, Ref} from "vue";
 
 interface ValidationRule {
     validator: (value: any) => boolean;
@@ -11,14 +11,12 @@ interface FieldValidation {
 }
 
 interface ValidationResult {
-    isValid: Ref<boolean>;
     errors: Ref<Record<string, string[]>>;
-    validate: () => boolean;
+    isValid: ComputedRef<boolean>;
 }
 
 export function useFormValidation(fields: Record<string, FieldValidation>): ValidationResult {
     const errors = ref<Record<string, string[]>>({});
-    const isValid = ref(true);
 
     const validateField = (fieldName: string, value: any, rules: ValidationRule[]) => {
         const fieldErrors: string[] = [];
@@ -33,7 +31,7 @@ export function useFormValidation(fields: Record<string, FieldValidation>): Vali
         errors.value[fieldName] = fieldErrors;
     };
 
-    const validate = (): boolean => {
+    const isValid = computed(() => {
         let formValid = true;
         errors.value = {};
 
@@ -45,9 +43,8 @@ export function useFormValidation(fields: Record<string, FieldValidation>): Vali
             }
         });
 
-        isValid.value = formValid;
         return formValid;
-    };
+    });
 
-    return { isValid, errors, validate };
+    return { errors, isValid };
 }

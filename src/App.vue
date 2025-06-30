@@ -1,20 +1,22 @@
 <template>
-  <form @submit.prevent="handleSubmit">
-    <input v-model="email" @blur="validateField('email')" />
-    <div v-if="errors.email">
+  <form class="form" @submit.prevent="handleSubmit">
+    <p class="form__title">Форма</p>
+    <input v-model="email" @blur="() => touchedEmail = true"/>
+    <div v-if="errors.email && touchedEmail">
       {{ errors.email.join(', ') }}
     </div>
 
-    <input v-model="password" type="password" @blur="validateField('password')" />
-    <div v-if="errors.password">
+    <input v-model="password" type="password" @blur="() => touchedPassword = true" />
+    <div v-if="errors.password && touchedPassword">
       {{ errors.password.join(', ') }}
     </div>
 
     <button :disabled="!isValid">Отправить</button>
   </form>
 
-  <div>
-    <button @click="getUsers">Загрузить данные</button>
+  <div class="example-api">
+    <p>Пример запроса</p>
+    <button @click="request">Загрузить данные</button>
     <div v-if="loading">Загрузка...</div>
     <div v-if="error">{{ error }}</div>
     <pre v-if="data">{{ data }}</pre>
@@ -29,7 +31,10 @@ import { useApi } from "@/hooks/useApi";
 const email = ref('');
 const password = ref('');
 
-const { isValid, errors, validate } = useFormValidation({
+const touchedEmail = ref(false)
+const touchedPassword = ref(false)
+
+const { errors, isValid } = useFormValidation({
   email: {
     value: email,
     rules: [
@@ -45,12 +50,8 @@ const { isValid, errors, validate } = useFormValidation({
   },
 });
 
-const validateField = (fieldName: string) => {
-  validate();
-};
-
 const handleSubmit = () => {
-  if (validate()) {
+  if (isValid.value) {
     alert('Форма валидна!');
   }
 };
@@ -59,12 +60,18 @@ const { data, error, loading, request } = useApi({
   url: 'https://jsonplaceholder.typicode.com/users',
   method: 'GET',
 });
-
-const getUsers = () => {
-  request();
-};
 </script>
 
-<style>
+<style scoped>
+.form {
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+  gap: 10px;
+}
 
+.example-api {
+  margin-top: 30px;
+}
 </style>
+
